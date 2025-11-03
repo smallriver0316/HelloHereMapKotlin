@@ -29,3 +29,8 @@ To build and run this project, you need credentials from the HERE SDK.
 2.  Create a file named `local.properties` in the root directory of the project (if it doesn't already exist).
 
 3.  Add your credentials to the `local.properties` file in the following format:
+
+```
+HERE_ACCESS_KEY_ID=<Your access key ID>
+HERE_ACCESS_KEY_SECRET=<Your access key secret>
+```
