@@ -4,38 +4,34 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.viewinterop.AndroidView
 import com.here.sdk.core.engine.AuthenticationMode
 import com.here.sdk.core.engine.SDKNativeEngine
 import com.here.sdk.core.engine.SDKOptions
-import com.example.helloheremapkotlin.ui.theme.HelloHereMapKotlinTheme
 import com.here.sdk.core.errors.InstantiationErrorException
+import com.here.sdk.mapview.MapScheme
+import com.here.sdk.mapview.MapView
+import com.example.helloheremapkotlin.ui.theme.HelloHereMapKotlinTheme
 
 class MainActivity : ComponentActivity() {
+
+    private var mapView: MapView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initHereSDK()
         enableEdgeToEdge()
         setContent {
             HelloHereMapKotlinTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                HereMapView(savedInstanceState)
             }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mapView?.onDestroy()
         disposeHereSDK()
     }
 
@@ -55,20 +51,22 @@ class MainActivity : ComponentActivity() {
         SDKNativeEngine.getSharedInstance()?.dispose()
         SDKNativeEngine.setSharedInstance(null)
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun setupMapView(savedInstanceState: Bundle?, mapView: MapView) {
+        this.mapView = mapView
+        mapView.onCreate(savedInstanceState)
+        mapView.onResume()
+        if (savedInstanceState == null) {
+           mapView.mapScene.loadScene(MapScheme.NORMAL_DAY, null)
+        }
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HelloHereMapKotlinTheme {
-        Greeting("Android")
+    @Composable
+    fun HereMapView(savedInstanceState: Bundle?) {
+        AndroidView(factory = { context ->
+            MapView(context).apply {
+                setupMapView(savedInstanceState, this)
+            }
+        })
     }
 }
