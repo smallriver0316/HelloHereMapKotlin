@@ -10,6 +10,8 @@ import com.here.sdk.core.engine.AuthenticationMode
 import com.here.sdk.core.engine.SDKNativeEngine
 import com.here.sdk.core.engine.SDKOptions
 import com.here.sdk.core.errors.InstantiationErrorException
+import com.here.sdk.core.GeoCoordinates
+import com.here.sdk.mapview.MapMeasure
 import com.here.sdk.mapview.MapScheme
 import com.here.sdk.mapview.MapView
 import com.example.helloheremapkotlin.ui.theme.HelloHereMapKotlinTheme
@@ -55,6 +57,12 @@ class MainActivity : ComponentActivity() {
     private fun setupMapView(savedInstanceState: Bundle?, mapView: MapView) {
         this.mapView = mapView
         mapView.onCreate(savedInstanceState)
+
+        // Set Tokyo station as the center of the map
+        val distanceInMeters = (1000 * 10).toDouble()
+        val mapMeasureZoom: MapMeasure = MapMeasure(MapMeasure.Kind.DISTANCE_IN_METERS, distanceInMeters)
+        mapView.camera.lookAt(GeoCoordinates(35.68147498159897, 139.76704300723313), mapMeasureZoom)
+
         mapView.onResume()
         if (savedInstanceState == null) {
            mapView.mapScene.loadScene(MapScheme.NORMAL_DAY, null)
